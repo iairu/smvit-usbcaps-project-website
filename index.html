@@ -3,298 +3,536 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Smart USB-TTL Converter | Project Hub</title>
+    <title>USBCAPS | Advanced USB-TTL Converter with BLE Protection</title>
+    <meta name="description" content="Advanced USB-TTL serial converter with automatic detection, BLE-based protection against USB Killers, and wireless terminal capabilities">
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <!-- Chosen Palette: Slate Harmony -->
-    <!-- Application Structure Plan: A single-page dashboard with a sticky top navigation for seamless scrolling between thematic sections (Overview, Features, Architecture, Plan, Enhancements). This non-linear structure allows users to quickly jump to the information they need, which is more user-friendly for a technical specification than a linear document. Interactive cards are used to reveal details on demand, reducing initial cognitive load and encouraging exploration of the project's core functionalities. -->
-    <!-- Visualization & Content Choices: 
-        - Report Info: Block Diagram -> Goal: Organize/Relationships -> Viz/Presentation: Recreated the diagram using responsive Tailwind CSS Flexbox/Grid for a clean, integrated look. -> Interaction: Hover effects on components could be added to display more info. -> Justification: More professional and responsive than pre-formatted text. -> Library/Method: HTML/CSS.
-        - Report Info: Key Features & Software Logic -> Goal: Inform/Organize -> Viz/Presentation: Combined into interactive 'feature cards'. A summary is always visible, with detailed logic revealed on click. -> Interaction: Click-to-expand toggle. -> Justification: This layers information, presenting a clean overview first and allowing users to dive deeper into the technical specifics as needed. -> Library/Method: HTML/CSS/JS.
-        - Report Info: Implementation Plan -> Goal: Change/Process -> Viz/Presentation: A vertical step-based timeline. -> Interaction: None, focuses on clarity. -> Justification: Visualizing the project phases as a sequence is more intuitive and engaging than a simple list. -> Library/Method: HTML/CSS.
-    -->
-    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
         body {
             font-family: 'Inter', sans-serif;
-            background-color: #f8fafc; /* slate-50 */
-            color: #334155; /* slate-700 */
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+        }
+        .glass {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
         }
         .nav-link {
-            transition: color 0.2s;
+            transition: all 0.3s;
         }
-        .feature-card-details {
-            max-height: 0;
-            overflow: hidden;
-            transition: max-height 0.5s ease-in-out, padding 0.5s ease-in-out;
+        .nav-link:hover {
+            transform: translateY(-2px);
         }
-        .feature-card.open .feature-card-details {
-            max-height: 500px; 
-            padding-top: 1rem;
-            padding-bottom: 1rem;
+        .feature-card {
+            transition: all 0.3s;
         }
-        .arrow-icon {
-            transition: transform 0.3s ease-in-out;
+        .feature-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
         }
-        .feature-card.open .arrow-icon {
-            transform: rotate(180deg);
+        .team-card {
+            transition: all 0.3s;
+        }
+        .team-card:hover {
+            transform: scale(1.05);
+        }
+        .stat-number {
+            font-size: 3rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        .patreon-btn {
+            background: linear-gradient(135deg, #ff424d 0%, #f96854 100%);
+            transition: all 0.3s;
+        }
+        .patreon-btn:hover {
+            transform: scale(1.05);
+            box-shadow: 0 10px 30px rgba(255, 66, 77, 0.4);
+        }
+        .social-icon {
+            transition: all 0.3s;
+        }
+        .social-icon:hover {
+            transform: translateY(-3px);
+        }
+        @keyframes float {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-20px); }
+        }
+        .floating {
+            animation: float 3s ease-in-out infinite;
         }
     </style>
 </head>
 <body class="antialiased">
 
-    <header class="bg-white/80 backdrop-blur-lg sticky top-0 z-50 border-b border-slate-200">
-        <nav class="container mx-auto px-6 py-4 flex justify-between items-center">
-            <h1 class="text-xl font-bold text-slate-800">Smart Converter Project</h1>
-            <div class="hidden md:flex items-center space-x-8">
-                <a href="#overview" class="nav-link text-slate-600 hover:text-indigo-600">Overview</a>
-                <a href="#features" class="nav-link text-slate-600 hover:text-indigo-600">Features</a>
-                <a href="#architecture" class="nav-link text-slate-600 hover:text-indigo-600">Architecture</a>
-                <a href="#plan" class="nav-link text-slate-600 hover:text-indigo-600">Plan</a>
-                <a href="#enhancements" class="nav-link text-slate-600 hover:text-indigo-600">Enhancements</a>
+    <!-- Header with Logo -->
+    <header class="glass sticky top-0 z-50">
+        <nav class="container mx-auto px-6 py-4">
+            <div class="flex justify-between items-center">
+                <div class="flex items-center space-x-4">
+                    <img src="img/smvit-logo-avatar.png" alt="SMVIT Logo" class="h-12 w-12 rounded-full">
+                    <h1 class="text-2xl font-bold text-white">USBCAPS</h1>
+                </div>
+                <div class="hidden md:flex items-center space-x-8">
+                    <a href="#overview" class="nav-link text-white hover:text-yellow-300">Overview</a>
+                    <a href="#features" class="nav-link text-white hover:text-yellow-300">Features</a>
+                    <a href="#team" class="nav-link text-white hover:text-yellow-300">Team</a>
+                    <a href="#support" class="nav-link text-white hover:text-yellow-300">Support Us</a>
+                    <a href="#contact" class="nav-link text-white hover:text-yellow-300">Connect</a>
+                </div>
             </div>
         </nav>
     </header>
 
     <main class="container mx-auto px-6 py-12">
 
+        <!-- Hero Section -->
         <section id="overview" class="mb-20 text-center">
-            <h2 class="text-4xl font-bold text-slate-900 mb-4">Smart USB-TTL Converter</h2>
-            <p class="text-lg max-w-3xl mx-auto text-slate-600">
-                This project outlines the design of an advanced USB-TTL serial converter to simplify development and testing. It integrates intelligent features like automatic baud rate and pin detection, along with wireless connectivity, creating a versatile tool for any electronics workspace.
+            <div class="mb-8">
+                <img src="img/smvit-brand-header.png" alt="SMVIT Brand" class="mx-auto max-w-full h-auto rounded-lg shadow-2xl">
+            </div>
+            <h2 class="text-5xl md:text-6xl font-bold text-white mb-6 floating">USBCAPS</h2>
+            <p class="text-2xl text-white mb-4 font-semibold">Advanced USB-TTL Converter with BLE Protection</p>
+            <p class="text-xl max-w-4xl mx-auto text-white opacity-90 mb-8">
+                Protect your devices from USB Killers while enjoying intelligent automation, wireless connectivity, and secure serial communication. Developed by IoT engineers, battle-tested in real-world scenarios.
             </p>
+            <div class="flex flex-wrap justify-center gap-4 mb-12">
+                <a href="#support" class="patreon-btn text-white font-bold py-3 px-8 rounded-full shadow-lg">
+                    ❤️ Support on Patreon
+                </a>
+                <a href="#features" class="glass text-white font-bold py-3 px-8 rounded-full hover:bg-white hover:text-purple-700 transition-all">
+                    Learn More
+                </a>
+            </div>
+
+            <!-- Key Stats -->
+            <div class="grid md:grid-cols-3 gap-8 max-w-4xl mx-auto">
+                <div class="glass p-6 rounded-lg">
+                    <div class="stat-number">95%</div>
+                    <p class="text-white text-lg">Devices Vulnerable to USB Killers</p>
+                </div>
+                <div class="glass p-6 rounded-lg">
+                    <div class="stat-number">$51K+</div>
+                    <p class="text-white text-lg">Average Attack Damage Cost</p>
+                </div>
+                <div class="glass p-6 rounded-lg">
+                    <div class="stat-number">100%</div>
+                    <p class="text-white text-lg">Electrical Isolation Protection</p>
+                </div>
+            </div>
         </section>
 
+        <!-- Problem Statement -->
+        <section class="mb-20">
+            <div class="glass p-8 rounded-2xl max-w-5xl mx-auto">
+                <h3 class="text-3xl font-bold text-white mb-6 text-center">The USB Killer Threat is Real</h3>
+                <div class="grid md:grid-cols-2 gap-8 text-white">
+                    <div>
+                        <h4 class="text-xl font-semibold mb-3 text-yellow-300">Real-World Incident (2019)</h4>
+                        <p class="mb-4">A student used USB Killer devices to destroy <strong>59 computers</strong>, 7 monitors, and multiple podiums at the College of St. Rose in New York, causing over <strong>$58,000 in damages</strong>.</p>
+                        <p class="text-sm opacity-80">Source: US Department of Justice Case Report</p>
+                    </div>
+                    <div>
+                        <h4 class="text-xl font-semibold mb-3 text-yellow-300">Technical Reality</h4>
+                        <p class="mb-4">USB Killer devices extract power from USB ports, store it in capacitors, then discharge <strong>high-voltage surges</strong> that permanently damage motherboards, USB controllers, and peripherals.</p>
+                        <p class="text-sm opacity-80">Testing shows 95% of devices lack adequate surge protection.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Features Section -->
         <section id="features" class="mb-20">
             <div class="text-center mb-12">
-                <h3 class="text-3xl font-bold text-slate-900">Core Functionality</h3>
-                <p class="text-md text-slate-500 mt-2">Click on each feature to explore the underlying logic and design.</p>
+                <h3 class="text-4xl font-bold text-white mb-4">Intelligent Features</h3>
+                <p class="text-xl text-white opacity-90">Everything you need for safe, efficient serial communication</p>
             </div>
             <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
                 
-                <div class="feature-card bg-white p-6 rounded-lg shadow-md cursor-pointer border border-slate-200 hover:border-indigo-400 transition-colors">
-                    <div class="flex justify-between items-center">
-                        <div class="flex items-center">
-                            <div class="bg-indigo-100 text-indigo-600 rounded-full p-2 mr-4">
-                                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" /></svg>
-                            </div>
-                            <h4 class="text-lg font-semibold text-slate-800">Auto Baud Rate Detection</h4>
-                        </div>
-                        <span class="arrow-icon text-slate-400">&#9660;</span>
+                <!-- Feature 1 -->
+                <div class="feature-card bg-white p-8 rounded-2xl shadow-xl">
+                    <div class="bg-gradient-to-br from-purple-500 to-pink-500 text-white rounded-full p-4 w-16 h-16 flex items-center justify-center mb-4">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" /></svg>
                     </div>
-                    <div class="feature-card-details">
-                        <p class="text-slate-600">The device eliminates manual configuration by intelligently identifying the correct transmission speed. The firmware cycles through a list of standard baud rates (from 300 to 115200), listening for data without framing errors. Upon receiving valid data, the rate is locked for stable communication.</p>
-                    </div>
+                    <h4 class="text-2xl font-bold text-gray-800 mb-3">BLE Protection Layer</h4>
+                    <p class="text-gray-600 mb-4">Complete electrical isolation prevents USB Killer attacks. Zero risk of voltage surge propagation to your host system.</p>
+                    <ul class="text-sm text-gray-700 space-y-2">
+                        <li>✓ 100% electrical separation</li>
+                        <li>✓ Bluetooth 5.0 wireless communication</li>
+                        <li>✓ 128-bit AES encryption</li>
+                        <li>✓ 10-40 meter operating range</li>
+                    </ul>
                 </div>
 
-                <div class="feature-card bg-white p-6 rounded-lg shadow-md cursor-pointer border border-slate-200 hover:border-indigo-400 transition-colors">
-                    <div class="flex justify-between items-center">
-                        <div class="flex items-center">
-                            <div class="bg-indigo-100 text-indigo-600 rounded-full p-2 mr-4">
-                                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4" /></svg>
-                            </div>
-                            <h4 class="text-lg font-semibold text-slate-800">Auto RX/TX Pin Swap</h4>
-                        </div>
-                        <span class="arrow-icon text-slate-400">&#9660;</span>
+                <!-- Feature 2 -->
+                <div class="feature-card bg-white p-8 rounded-2xl shadow-xl">
+                    <div class="bg-gradient-to-br from-blue-500 to-cyan-500 text-white rounded-full p-4 w-16 h-16 flex items-center justify-center mb-4">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" /></svg>
                     </div>
-                    <div class="feature-card-details">
-                         <p class="text-slate-600">To prevent common connection issues, the converter automatically handles incorrect RX/TX wiring. If no data is received on the default pin configuration after a short timeout, the firmware programmatically swaps the RX and TX pin functions and retries, ensuring a connection is established seamlessly.</p>
-                    </div>
+                    <h4 class="text-2xl font-bold text-gray-800 mb-3">Auto Baud Detection</h4>
+                    <p class="text-gray-600 mb-4">Automatically identifies the correct transmission speed, eliminating manual configuration and troubleshooting.</p>
+                    <ul class="text-sm text-gray-700 space-y-2">
+                        <li>✓ Supports 300 to 115200 baud</li>
+                        <li>✓ Intelligent frame detection</li>
+                        <li>✓ Locks onto valid data</li>
+                        <li>✓ Zero configuration needed</li>
+                    </ul>
                 </div>
 
-                <div class="feature-card bg-white p-6 rounded-lg shadow-md cursor-pointer border border-slate-200 hover:border-indigo-400 transition-colors">
-                    <div class="flex justify-between items-center">
-                        <div class="flex items-center">
-                            <div class="bg-indigo-100 text-indigo-600 rounded-full p-2 mr-4">
-                                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.111 16.404a5.5 5.5 0 017.778 0M12 20h.01m-7.08-7.071a10 10 0 0114.142 0M1.393 9.393a15 15 0 0121.214 0" /></svg>
-                            </div>
-                            <h4 class="text-lg font-semibold text-slate-800">Wireless Terminal</h4>
-                        </div>
-                       <span class="arrow-icon text-slate-400">&#9660;</span>
+                <!-- Feature 3 -->
+                <div class="feature-card bg-white p-8 rounded-2xl shadow-xl">
+                    <div class="bg-gradient-to-br from-green-500 to-teal-500 text-white rounded-full p-4 w-16 h-16 flex items-center justify-center mb-4">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4" /></svg>
                     </div>
-                     <div class="feature-card-details">
-                         <p class="text-slate-600">The device integrates an ESP32 to function as a wireless bridge. In Wi-Fi mode, it hosts a web server with a WebSocket terminal. In Bluetooth mode, it uses the Serial Port Profile (SPP), allowing connection from any standard Bluetooth terminal app on a mobile device or PC.</p>
+                    <h4 class="text-2xl font-bold text-gray-800 mb-3">Auto Pin Detection</h4>
+                    <p class="text-gray-600 mb-4">Automatically detects and corrects crossed RX/TX pin connections using ESP32 GPIO matrix reconfiguration.</p>
+                    <ul class="text-sm text-gray-700 space-y-2">
+                        <li>✓ Software pin swapping</li>
+                        <li>✓ 500ms detection timeout</li>
+                        <li>✓ Prevents wiring mistakes</li>
+                        <li>✓ Instant configuration</li>
+                    </ul>
+                </div>
+
+                <!-- Feature 4 -->
+                <div class="feature-card bg-white p-8 rounded-2xl shadow-xl">
+                    <div class="bg-gradient-to-br from-yellow-500 to-orange-500 text-white rounded-full p-4 w-16 h-16 flex items-center justify-center mb-4">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.111 16.404a5.5 5.5 0 017.778 0M12 20h.01m-7.08-7.071a10 10 0 0114.142 0M1.393 9.393a15 15 0 0121.214 0" /></svg>
                     </div>
+                    <h4 class="text-2xl font-bold text-gray-800 mb-3">Wireless Terminal</h4>
+                    <p class="text-gray-600 mb-4">Access serial terminal via Wi-Fi web interface or Bluetooth from any device - smartphone, tablet, or laptop.</p>
+                    <ul class="text-sm text-gray-700 space-y-2">
+                        <li>✓ WebSocket real-time communication</li>
+                        <li>✓ Bluetooth SPP support</li>
+                        <li>✓ Browser-based interface</li>
+                        <li>✓ Cross-platform compatibility</li>
+                    </ul>
+                </div>
+
+                <!-- Feature 5 -->
+                <div class="feature-card bg-white p-8 rounded-2xl shadow-xl">
+                    <div class="bg-gradient-to-br from-red-500 to-pink-500 text-white rounded-full p-4 w-16 h-16 flex items-center justify-center mb-4">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 15a4 4 0 004 4h9a5 5 0 10-.1-9.999 5.002 5.002 0 10-9.78 2.096A4.001 4.001 0 003 15z" /></svg>
+                    </div>
+                    <h4 class="text-2xl font-bold text-gray-800 mb-3">Energy Efficient</h4>
+                    <p class="text-gray-600 mb-4">BLE 5.0 technology with optimized power consumption for extended operation and minimal heat generation.</p>
+                    <ul class="text-sm text-gray-700 space-y-2">
+                        <li>✓ 6-7mA active transmission</li>
+                        <li>✓ &lt;1mA sleep mode</li>
+                        <li>✓ &lt;100ms connection time</li>
+                        <li>✓ Adaptive frequency hopping</li>
+                    </ul>
+                </div>
+
+                <!-- Feature 6 -->
+                <div class="feature-card bg-white p-8 rounded-2xl shadow-xl">
+                    <div class="bg-gradient-to-br from-indigo-500 to-purple-500 text-white rounded-full p-4 w-16 h-16 flex items-center justify-center mb-4">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 3v2m6-2v2M9 19v2m6-2v2M5 9H3m2 6H3m18-6h-2m2 6h-2M7 19h10a2 2 0 002-2V7a2 2 0 00-2-2H7a2 2 0 00-2 2v10a2 2 0 002 2zM9 9h6v6H9V9z" /></svg>
+                    </div>
+                    <h4 class="text-2xl font-bold text-gray-800 mb-3">Dual Voltage Support</h4>
+                    <p class="text-gray-600 mb-4">Provides both 3.3V and 5V output with logic level shifting for compatibility with various microcontrollers.</p>
+                    <ul class="text-sm text-gray-700 space-y-2">
+                        <li>✓ 3.3V regulated (AMS1117)</li>
+                        <li>✓ 5V passthrough available</li>
+                        <li>✓ Optional level shifting</li>
+                        <li>✓ Arduino/ESP32/STM32 compatible</li>
+                    </ul>
                 </div>
 
             </div>
         </section>
 
-        <section id="architecture" class="mb-20">
-            <div class="text-center mb-12">
-                <h3 class="text-3xl font-bold text-slate-900">System Architecture</h3>
-                <p class="text-md text-slate-500 mt-2">A look at the hardware components and their connections.</p>
-            </div>
-            <div class="bg-white p-8 rounded-lg shadow-lg border border-slate-200">
-                <div class="grid lg:grid-cols-3 gap-8 items-center">
-                    <div class="lg:col-span-2">
-                        <h4 class="font-semibold text-lg text-slate-800 mb-4 text-center">Hardware Block Diagram</h4>
-                        <div class="flex flex-col md:flex-row items-center justify-center space-y-4 md:space-y-0 md:space-x-4 text-center">
-                            <div class="p-4 bg-slate-100 rounded-lg w-40"><strong>PC (USB)</strong></div>
-                            <div class="font-bold text-slate-500 text-2xl">&harr;</div>
-                             <div class="p-4 border-2 border-slate-300 rounded-lg w-40">
-                                <strong>USB-to-UART</strong>
-                                <span class="text-xs block text-slate-500">(CP2102/CH340)</span>
-                            </div>
-                            <div class="font-bold text-slate-500 text-2xl">&harr;</div>
-                            <div class="relative p-4 border-2 border-indigo-500 rounded-lg w-40">
-                                <strong class="text-indigo-700">ESP32 Core</strong>
-                                <div class="absolute -bottom-10 left-1/2 -translate-x-1/2 text-center">
-                                    <div class="font-bold text-slate-500 text-2xl transform -rotate-90 md:rotate-0">&harr;</div>
-                                    <div class="p-2 mt-2 md:mt-0 border-2 border-slate-300 rounded-lg">
-                                        <strong>Wireless</strong>
-                                        <span class="text-xs block text-slate-500">(Wi-Fi/BT)</span>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="font-bold text-slate-500 text-2xl mt-12 md:mt-0">&harr;</div>
-                            <div class="p-4 border-2 border-slate-300 rounded-lg w-40 mt-12 md:mt-0">
-                                <strong>Target Device</strong>
-                                <span class="text-xs block text-slate-500">(MCU, Sensor...)</span>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="pt-16 md:pt-0">
-                        <h4 class="font-semibold text-lg text-slate-800 mb-4">Key Components</h4>
-                        <ul class="list-disc list-inside text-slate-600 space-y-2">
-                            <li><strong>Microcontroller:</strong> ESP32-WROOM-32</li>
+        <!-- Technical Specs -->
+        <section class="mb-20">
+            <div class="glass p-8 rounded-2xl max-w-6xl mx-auto">
+                <h3 class="text-3xl font-bold text-white mb-8 text-center">Technical Specifications</h3>
+                <div class="grid md:grid-cols-2 gap-8 text-white">
+                    <div>
+                        <h4 class="text-xl font-semibold mb-4 text-yellow-300">Hardware</h4>
+                        <ul class="space-y-2">
+                            <li><strong>MCU:</strong> ESP32-WROOM-32 (Dual-core @ 240MHz)</li>
+                            <li><strong>RAM:</strong> 520 KB SRAM</li>
+                            <li><strong>Flash:</strong> 4 MB</li>
                             <li><strong>USB Bridge:</strong> CP2102 or CH340G</li>
-                            <li><strong>Regulator:</strong> AMS1117-3.3</li>
-                            <li><strong>Level Shifter:</strong> Optional (BSS138 based)</li>
-                            <li><strong>Connectors:</strong> USB-C / Micro USB</li>
+                            <li><strong>Voltage Regulator:</strong> AMS1117-3.3</li>
+                            <li><strong>Connector:</strong> USB-C / Micro USB</li>
+                        </ul>
+                    </div>
+                    <div>
+                        <h4 class="text-xl font-semibold mb-4 text-yellow-300">Bluetooth 5.0</h4>
+                        <ul class="space-y-2">
+                            <li><strong>PHY:</strong> LE 2M (2 Mb/s data rate)</li>
+                            <li><strong>Throughput:</strong> 938 kb/s practical</li>
+                            <li><strong>Range:</strong> 10-40 meters</li>
+                            <li><strong>Security:</strong> LE Secure Connections, 128-bit AES</li>
+                            <li><strong>Connection Time:</strong> &lt;100ms</li>
+                            <li><strong>Packet Loss:</strong> &lt;0.1% under normal conditions</li>
+                        </ul>
+                    </div>
+                    <div>
+                        <h4 class="text-xl font-semibold mb-4 text-yellow-300">Serial Interface</h4>
+                        <ul class="space-y-2">
+                            <li><strong>Baud Rates:</strong> 300 to 115200 (auto-detect)</li>
+                            <li><strong>Protocol:</strong> TTL UART</li>
+                            <li><strong>Data Bits:</strong> 8</li>
+                            <li><strong>Stop Bits:</strong> 1</li>
+                            <li><strong>Parity:</strong> None</li>
+                            <li><strong>Flow Control:</strong> None</li>
+                        </ul>
+                    </div>
+                    <div>
+                        <h4 class="text-xl font-semibold mb-4 text-yellow-300">Power & Environment</h4>
+                        <ul class="space-y-2">
+                            <li><strong>Input Voltage:</strong> 5V via USB</li>
+                            <li><strong>Output Voltage:</strong> 3.3V / 5V</li>
+                            <li><strong>Active Current:</strong> 6-7mA (transmitting)</li>
+                            <li><strong>Sleep Current:</strong> &lt;1mA</li>
+                            <li><strong>Operating Temp:</strong> -40°C to +85°C</li>
+                            <li><strong>Status LEDs:</strong> Power, RX, TX activity</li>
                         </ul>
                     </div>
                 </div>
             </div>
         </section>
-        
-        <section id="plan" class="mb-20">
-             <div class="text-center mb-12">
-                <h3 class="text-3xl font-bold text-slate-900">Implementation Plan</h3>
-                <p class="text-md text-slate-500 mt-2">A five-phase plan from prototype to production.</p>
-            </div>
-            <div class="relative">
-                <div class="absolute left-1/2 top-0 bottom-0 w-0.5 bg-slate-300 hidden md:block"></div>
-                <div class="space-y-12">
 
-                    <div class="relative md:flex items-center">
-                        <div class="md:w-1/2 md:pr-8 md:text-right">
-                            <div class="bg-white p-6 rounded-lg shadow-md border border-slate-200">
-                                <p class="text-indigo-600 font-semibold">Phase 1</p>
-                                <h4 class="text-lg font-bold text-slate-800">Breadboard Prototype</h4>
-                                <p class="text-slate-600">Wire basic components and test core USB-TTL functionality.</p>
-                            </div>
+        <!-- Architecture Diagram -->
+        <section class="mb-20">
+            <div class="glass p-8 rounded-2xl max-w-6xl mx-auto">
+                <h3 class="text-3xl font-bold text-white mb-8 text-center">System Architecture</h3>
+                <div class="bg-white p-8 rounded-xl">
+                    <div class="flex flex-col md:flex-row items-center justify-center space-y-4 md:space-y-0 md:space-x-4 text-center">
+                        <div class="p-4 bg-blue-100 rounded-lg w-40 border-2 border-blue-300">
+                            <strong class="text-blue-800">PC (USB)</strong>
                         </div>
-                        <div class="absolute left-1/2 -translate-x-1/2 w-8 h-8 bg-indigo-600 rounded-full border-4 border-white hidden md:block"></div>
-                        <div class="md:w-1/2 md:pl-8 mt-4 md:mt-0"></div>
-                    </div>
-                    
-                    <div class="relative md:flex items-center">
-                        <div class="md:w-1/2 md:pr-8 mt-4 md:mt-0 order-2 md:order-1"></div>
-                        <div class="absolute left-1/2 -translate-x-1/2 w-8 h-8 bg-indigo-600 rounded-full border-4 border-white hidden md:block order-1 md:order-2"></div>
-                         <div class="md:w-1/2 md:pl-8 md:text-left order-1 md:order-2">
-                            <div class="bg-white p-6 rounded-lg shadow-md border border-slate-200">
-                                <p class="text-indigo-600 font-semibold">Phase 2</p>
-                                <h4 class="text-lg font-bold text-slate-800">Firmware Implementation</h4>
-                                <p class="text-slate-600">Program modules for auto-detection and the wireless bridge.</p>
-                            </div>
+                        <div class="font-bold text-gray-500 text-2xl">⟷</div>
+                        <div class="p-4 border-2 border-gray-300 rounded-lg w-40 bg-gray-50">
+                            <strong>USB-to-UART</strong>
+                            <span class="text-xs block text-gray-500">(CP2102/CH340)</span>
+                        </div>
+                        <div class="font-bold text-gray-500 text-2xl">⟷</div>
+                        <div class="relative p-4 border-4 border-purple-500 rounded-lg w-48 bg-purple-50">
+                            <strong class="text-purple-700 text-lg">ESP32 Core</strong>
+                            <span class="text-xs block text-gray-600 mt-1">Dual UART + BLE 5.0</span>
+                        </div>
+                        <div class="font-bold text-gray-500 text-2xl">⟷</div>
+                        <div class="p-4 border-2 border-gray-300 rounded-lg w-40 bg-gray-50">
+                            <strong>Target Device</strong>
+                            <span class="text-xs block text-gray-500">(MCU, Sensor...)</span>
                         </div>
                     </div>
-
-                    <div class="relative md:flex items-center">
-                        <div class="md:w-1/2 md:pr-8 md:text-right">
-                            <div class="bg-white p-6 rounded-lg shadow-md border border-slate-200">
-                                <p class="text-indigo-600 font-semibold">Phase 3</p>
-                                <h4 class="text-lg font-bold text-slate-800">Web App Development</h4>
-                                <p class="text-slate-600">Create a responsive HTML/JS interface for the Wi-Fi terminal.</p>
-                            </div>
-                        </div>
-                        <div class="absolute left-1/2 -translate-x-1/2 w-8 h-8 bg-indigo-600 rounded-full border-4 border-white hidden md:block"></div>
-                        <div class="md:w-1/2 md:pl-8 mt-4 md:mt-0"></div>
-                    </div>
-
-                     <div class="relative md:flex items-center">
-                        <div class="md:w-1/2 md:pr-8 mt-4 md:mt-0 order-2 md:order-1"></div>
-                        <div class="absolute left-1/2 -translate-x-1/2 w-8 h-8 bg-indigo-600 rounded-full border-4 border-white hidden md:block order-1 md:order-2"></div>
-                         <div class="md:w-1/2 md:pl-8 md:text-left order-1 md:order-2">
-                            <div class="bg-white p-6 rounded-lg shadow-md border border-slate-200">
-                                <p class="text-indigo-600 font-semibold">Phase 4</p>
-                                <h4 class="text-lg font-bold text-slate-800">PCB Design</h4>
-                                <p class="text-slate-600">Design and manufacture a custom PCB for a compact solution.</p>
-                            </div>
+                    <div class="mt-8 text-center">
+                        <div class="inline-block p-4 border-4 border-green-500 rounded-lg bg-green-50">
+                            <strong class="text-green-700 text-lg">📡 BLE 5.0 Wireless</strong>
+                            <span class="text-xs block text-gray-600 mt-1">Wi-Fi Web Terminal + Bluetooth SPP</span>
                         </div>
                     </div>
-
-                    <div class="relative md:flex items-center">
-                        <div class="md:w-1/2 md:pr-8 md:text-right">
-                            <div class="bg-white p-6 rounded-lg shadow-md border border-slate-200">
-                                <p class="text-indigo-600 font-semibold">Phase 5</p>
-                                <h4 class="text-lg font-bold text-slate-800">Final Assembly & Testing</h4>
-                                <p class="text-slate-600">Populate the PCB and conduct comprehensive feature testing.</p>
-                            </div>
-                        </div>
-                        <div class="absolute left-1/2 -translate-x-1/2 w-8 h-8 bg-indigo-600 rounded-full border-4 border-white hidden md:block"></div>
-                        <div class="md:w-1/2 md:pl-8 mt-4 md:mt-0"></div>
-                    </div>
-
                 </div>
             </div>
         </section>
 
-        <section id="enhancements">
+        <!-- Team Section -->
+        <section id="team" class="mb-20">
             <div class="text-center mb-12">
-                <h3 class="text-3xl font-bold text-slate-900">Possible Enhancements</h3>
-                <p class="text-md text-slate-500 mt-2">Future ideas to expand the project's capabilities.</p>
+                <h3 class="text-4xl font-bold text-white mb-4">Meet the Team</h3>
+                <p class="text-xl text-white opacity-90">IoT Engineers passionate about innovative solutions</p>
             </div>
-            <div class="grid sm:grid-cols-2 lg:grid-cols-4 gap-6 text-center">
-                <div class="bg-white p-6 rounded-lg shadow-sm border border-slate-200">
-                    <h4 class="font-semibold text-slate-800">OLED Display</h4>
-                    <p class="text-sm text-slate-600 mt-1">Show real-time status like baud rate and IP address.</p>
+            <div class="grid md:grid-cols-3 gap-8 max-w-5xl mx-auto">
+                
+                <!-- Team Member 1 -->
+                <div class="team-card glass p-8 rounded-2xl text-center">
+                    <div class="bg-gradient-to-br from-purple-500 to-pink-500 text-white rounded-full w-24 h-24 flex items-center justify-center mx-auto mb-4 text-4xl font-bold">
+                        DI
+                    </div>
+                    <h4 class="text-2xl font-bold text-white mb-2">Denis Ivan</h4>
+                    <p class="text-yellow-300 font-semibold mb-3">IoT Engineer</p>
+                    <p class="text-white opacity-90">Creator of the USBCAPS idea and Hardware Design Lead</p>
                 </div>
-                <div class="bg-white p-6 rounded-lg shadow-sm border border-slate-200">
-                    <h4 class="font-semibold text-slate-800">Manual Override</h4>
-                    <p class="text-sm text-slate-600 mt-1">A physical switch to disable auto-detection.</p>
+
+                <!-- Team Member 2 -->
+                <div class="team-card glass p-8 rounded-2xl text-center">
+                    <div class="bg-gradient-to-br from-blue-500 to-cyan-500 text-white rounded-full w-24 h-24 flex items-center justify-center mx-auto mb-4 text-4xl font-bold">
+                        OŠ
+                    </div>
+                    <h4 class="text-2xl font-bold text-white mb-2">Ondrej Špánik</h4>
+                    <p class="text-yellow-300 font-semibold mb-3">IoT Engineer</p>
+                    <p class="text-white opacity-90">KNIFE Framework Developer, Social Media Manager, Firmware Development</p>
                 </div>
-                 <div class="bg-white p-6 rounded-lg shadow-sm border border-slate-200">
-                    <h4 class="font-semibold text-slate-800">Protocol Expansion</h4>
-                    <p class="text-sm text-slate-600 mt-1">Add support for I2C/SPI or a simple logic analyzer.</p>
+
+                <!-- Team Member 3 -->
+                <div class="team-card glass p-8 rounded-2xl text-center">
+                    <div class="bg-gradient-to-br from-green-500 to-teal-500 text-white rounded-full w-24 h-24 flex items-center justify-center mx-auto mb-4 text-4xl font-bold">
+                        DB
+                    </div>
+                    <h4 class="text-2xl font-bold text-white mb-2">Danilo Bashmakov</h4>
+                    <p class="text-yellow-300 font-semibold mb-3">IoT Engineer</p>
+                    <p class="text-white opacity-90">Testing and Integration Specialist</p>
                 </div>
-                 <div class="bg-white p-6 rounded-lg shadow-sm border border-slate-200">
-                    <h4 class="font-semibold text-slate-800">3D Printed Enclosure</h4>
-                    <p class="text-sm text-slate-600 mt-1">Design a custom case for a professional finish.</p>
+
+            </div>
+        </section>
+
+        <!-- Implementation Roadmap -->
+        <section id="plan" class="mb-20">
+            <div class="text-center mb-12">
+                <h3 class="text-4xl font-bold text-white mb-4">Implementation Roadmap</h3>
+                <p class="text-xl text-white opacity-90">Five-phase development plan from prototype to production</p>
+            </div>
+            <div class="max-w-4xl mx-auto space-y-6">
+
+                <!-- Phase 1 -->
+                <div class="glass p-6 rounded-xl flex items-start space-x-4">
+                    <div class="bg-gradient-to-br from-purple-500 to-pink-500 text-white rounded-full w-12 h-12 flex items-center justify-center font-bold text-lg flex-shrink-0">
+                        1
+                    </div>
+                    <div class="text-white">
+                        <h4 class="text-xl font-bold mb-2">Breadboard Prototype</h4>
+                        <p class="opacity-90">Wire basic components and test core USB-TTL functionality with ESP32 and CP2102 modules.</p>
+                    </div>
+                </div>
+
+                <!-- Phase 2 -->
+                <div class="glass p-6 rounded-xl flex items-start space-x-4">
+                    <div class="bg-gradient-to-br from-blue-500 to-cyan-500 text-white rounded-full w-12 h-12 flex items-center justify-center font-bold text-lg flex-shrink-0">
+                        2
+                    </div>
+                    <div class="text-white">
+                        <h4 class="text-xl font-bold mb-2">Firmware Implementation</h4>
+                        <p class="opacity-90">Program modules for auto-detection (baud rate, pin swap), BLE communication, and security features.</p>
+                    </div>
+                </div>
+
+                <!-- Phase 3 -->
+                <div class="glass p-6 rounded-xl flex items-start space-x-4">
+                    <div class="bg-gradient-to-br from-green-500 to-teal-500 text-white rounded-full w-12 h-12 flex items-center justify-center font-bold text-lg flex-shrink-0">
+                        3
+                    </div>
+                    <div class="text-white">
+                        <h4 class="text-xl font-bold mb-2">Web Application Development</h4>
+                        <p class="opacity-90">Create responsive HTML/CSS/JavaScript interface with WebSocket terminal for Wi-Fi connectivity.</p>
+                    </div>
+                </div>
+
+                <!-- Phase 4 -->
+                <div class="glass p-6 rounded-xl flex items-start space-x-4">
+                    <div class="bg-gradient-to-br from-yellow-500 to-orange-500 text-white rounded-full w-12 h-12 flex items-center justify-center font-bold text-lg flex-shrink-0">
+                        4
+                    </div>
+                    <div class="text-white">
+                        <h4 class="text-xl font-bold mb-2">PCB Design</h4>
+                        <p class="opacity-90">Design and manufacture custom PCB for compact, production-ready solution with automotive-grade components.</p>
+                    </div>
+                </div>
+
+                <!-- Phase 5 -->
+                <div class="glass p-6 rounded-xl flex items-start space-x-4">
+                    <div class="bg-gradient-to-br from-red-500 to-pink-500 text-white rounded-full w-12 h-12 flex items-center justify-center font-bold text-lg flex-shrink-0">
+                        5
+                    </div>
+                    <div class="text-white">
+                        <h4 class="text-xl font-bold mb-2">Final Assembly & Testing</h4>
+                        <p class="opacity-90">Populate the PCB and conduct comprehensive feature testing across all supported platforms.</p>
+                    </div>
+                </div>
+
+            </div>
+        </section>
+
+        <!-- Possible Enhancements -->
+        <section id="enhancements" class="mb-20">
+            <div class="text-center mb-12">
+                <h3 class="text-4xl font-bold text-white mb-4">Possible Enhancements</h3>
+                <p class="text-xl text-white opacity-90">Future ideas to expand the project's capabilities</p>
+            </div>
+            <div class="grid sm:grid-cols-2 lg:grid-cols-4 gap-6 max-w-6xl mx-auto">
+                <div class="glass p-6 rounded-xl text-center">
+                    <h4 class="text-xl font-semibold text-white mb-2">OLED Display</h4>
+                    <p class="text-white opacity-90">Show real-time status like baud rate and IP address</p>
+                </div>
+                <div class="glass p-6 rounded-xl text-center">
+                    <h4 class="text-xl font-semibold text-white mb-2">Manual Override</h4>
+                    <p class="text-white opacity-90">A physical switch to disable auto-detection</p>
+                </div>
+                <div class="glass p-6 rounded-xl text-center">
+                    <h4 class="text-xl font-semibold text-white mb-2">Protocol Expansion</h4>
+                    <p class="text-white opacity-90">Add support for I2C/SPI or a simple logic analyzer</p>
+                </div>
+                <div class="glass p-6 rounded-xl text-center">
+                    <h4 class="text-xl font-semibold text-white mb-2">3D Printed Enclosure</h4>
+                    <p class="text-white opacity-90">Design a custom case for a professional finish</p>
                 </div>
             </div>
         </section>
+
+        <!-- Support Section -->
+        <section id="support" class="mb-20">
+            <div class="glass p-12 rounded-2xl max-w-4xl mx-auto text-center">
+                <h3 class="text-4xl font-bold text-white mb-6">Support Our Work</h3>
+                <p class="text-xl text-white opacity-90 mb-8">
+                    Help us bring USBCAPS to life! Your support enables us to purchase components, 
+                    manufacture PCBs, and dedicate more time to development and testing.
+                </p>
+                <div class="flex flex-col sm:flex-row justify-center gap-4 mb-8">
+                    <a href="https://www.patreon.com" target="_blank" rel="noopener noreferrer" class="patreon-btn text-white font-bold py-4 px-10 rounded-full shadow-lg text-lg">
+                        ❤️ Become a Patron
+                    </a>
+                    <a href="#contact" class="glass text-white font-bold py-4 px-10 rounded-full hover:bg-white hover:text-purple-700 transition-all text-lg">
+                        Get in Touch
+                    </a>
+                </div>
+                <p class="text-white opacity-75">Every contribution helps us improve hardware security for everyone.</p>
+            </div>
+        </section>
+
+        <!-- Contact Section -->
+        <section id="contact" class="mb-20">
+            <div class="text-center mb-12">
+                <h3 class="text-4xl font-bold text-white mb-4">Connect With Us</h3>
+                <p class="text-xl text-white opacity-90">Follow our progress and get in touch</p>
+            </div>
+            <div class="max-w-2xl mx-auto">
+                <div class="glass p-8 rounded-2xl">
+                    <div class="grid sm:grid-cols-3 gap-6 text-center">
+                        <a href="https://github.com" target="_blank" rel="noopener noreferrer" class="social-icon glass p-6 rounded-xl hover:bg-white hover:text-purple-700 transition-all">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12 mx-auto mb-2 text-white" fill="currentColor" viewBox="0 0 24 24"><path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/></svg>
+                            <p class="text-white font-semibold">GitHub</p>
+                        </a>
+                        <a href="https://twitter.com" target="_blank" rel="noopener noreferrer" class="social-icon glass p-6 rounded-xl hover:bg-white hover:text-purple-700 transition-all">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12 mx-auto mb-2 text-white" fill="currentColor" viewBox="0 0 24 24"><path d="M24 4.557c-.883.392-1.832.656-2.828.775 1.017-.609 1.798-1.574 2.165-2.724-.951.564-2.005.974-3.127 1.195-.897-.957-2.178-1.555-3.594-1.555-3.179 0-5.515 2.966-4.797 6.045-4.091-.205-7.719-2.165-10.148-5.144-1.29 2.213-.669 5.108 1.523 6.574-.806-.026-1.566-.247-2.229-.616-.054 2.281 1.581 4.415 3.949 4.89-.693.188-1.452.232-2.224.084.626 1.956 2.444 3.379 4.6 3.419-2.07 1.623-4.678 2.348-7.29 2.04 2.179 1.397 4.768 2.212 7.548 2.212 9.142 0 14.307-7.721 13.995-14.646.962-.695 1.797-1.562 2.457-2.549z"/></svg>
+                            <p class="text-white font-semibold">Twitter</p>
+                        </a>
+                        <a href="mailto:contact@usbcaps.dev" class="social-icon glass p-6 rounded-xl hover:bg-white hover:text-purple-700 transition-all">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12 mx-auto mb-2 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" /></svg>
+                            <p class="text-white font-semibold">Email</p>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </section>
+
     </main>
-    
-    <footer class="border-t border-slate-200 mt-20">
-        <div class="container mx-auto px-6 py-6 text-center text-slate-500">
-            <p>&copy; 2025 Smart USB-TTL Converter Project Proposal. All rights reserved.</p>
+
+    <!-- Footer -->
+    <footer class="glass border-t border-white/20 mt-20">
+        <div class="container mx-auto px-6 py-8">
+            <div class="flex flex-col md:flex-row justify-between items-center">
+                <div class="flex items-center space-x-4 mb-4 md:mb-0">
+                    <img src="img/smvit-logo-avatar.png" alt="SMVIT Logo" class="h-10 w-10 rounded-full">
+                    <p class="text-white font-semibold">USBCAPS Project</p>
+                </div>
+                <div class="text-white opacity-75 text-center">
+                    <p>&copy; 2025 USBCAPS Team. All rights reserved.</p>
+                    <p class="text-sm mt-1">Developed by IoT Engineers at SMVIT</p>
+                </div>
+            </div>
         </div>
     </footer>
 
-    <script>
-        document.addEventListener('DOMContentLoaded', () => {
-            const featureCards = document.querySelectorAll('.feature-card');
-            
-            featureCards.forEach(card => {
-                card.addEventListener('click', () => {
-                    card.classList.toggle('open');
-                });
-            });
-
-            const navLinks = document.querySelectorAll('a[href^="#"]');
-            navLinks.forEach(anchor => {
-                anchor.addEventListener('click', function (e) {
-                    e.preventDefault();
-                    document.querySelector(this.getAttribute('href')).scrollIntoView({
-                        behavior: 'smooth'
-                    });
-                });
-            });
-        });
-    </script>
 </body>
 </html>
